@@ -26,4 +26,4 @@ Use this mod responsibly and at your own risk.
 ## License
 
 This project is licensed under the [MIT License](LICENSE).<br>
-Parts of this codebase are inspired from [MCRPX by Michal Spišak (Speedy11CZ)](https://github.com/Speedy11CZ/MCRPX).
+Some parts of this codebase are inspired from [MCRPX by Michal Spišak (Speedy11CZ)](https://github.com/Speedy11CZ/MCRPX).
