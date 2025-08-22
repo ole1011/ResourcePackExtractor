@@ -11,6 +11,7 @@ import de.ole101.rpx.util.ZipUtil
 import kotlinx.coroutines.launch
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
@@ -155,7 +156,7 @@ class ExtractPackScreen(private val parent: Screen) : Screen(Text.translatable("
         return super.mouseClicked(mouseX, mouseY, button)
     }
 
-    override fun resize(client: net.minecraft.client.MinecraftClient?, width: Int, height: Int) {
+    override fun resize(client: MinecraftClient?, width: Int, height: Int) {
         val previouslySelected = getSelectedPackProfile()
         super.resize(client, width, height)
 
