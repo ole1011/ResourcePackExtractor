@@ -78,4 +78,5 @@ jobs:
               --target main \
               --repo="$GITHUB_REPOSITORY" \
               --title="$tag" \
-              --generate-notes
+              --generate-notes \
+              ./build/libs/*.jar
