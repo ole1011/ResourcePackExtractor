@@ -1,0 +1,29 @@
+{
+    "schemaVersion": 1,
+    "id": "rpx",
+    "version": "${version}",
+    "name": "ResourcePackExtractor",
+    "description": "Fabric 1.21.8 mod that allows extracting server resource packs in-game.",
+    "authors": [],
+    "contact": {},
+    "license": "MIT",
+    "icon": "assets/rpx/icon.png",
+    "environment": "client",
+    "entrypoints": {
+        "client": [
+            "de.ole101.rpx.client.ResourcePackExtractorClient"
+        ],
+        "main": [
+            "de.ole101.rpx.ResourcePackExtractor"
+        ]
+    },
+    "mixins": [
+        "rpx.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${loader_version}",
+        "fabric-language-kotlin": ">=${kotlin_loader_version}",
+        "fabric": "*",
+        "minecraft": "${minecraft_version}"
+    }
+}

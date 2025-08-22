@@ -1,0 +1,81 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The version of the release (e.g. 1.0.0)'
+        required: true
+        type: string
+
+run-name: Build+${{ github.run_number }} release/${{ inputs.version }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update version in gradle.properties
+        run: |
+          sed -i "s/^mod_version=.*/mod_version=${{ github.event.inputs.version }}/" gradle.properties
+
+      - name: Commit version bump
+        run: |
+          git add gradle.properties
+          git commit -m "Update version to ${{ github.event.inputs.version }}" || echo "No changes to commit"
+          git push origin develop
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Make gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build --full-stacktrace
+
+      - name: Merge develop into main
+        run: |
+          git checkout main
+          git pull origin main
+          git merge --no-ff develop -m "Release ${{ github.event.inputs.version }}"
+          git push origin main
+
+      - name: Build with Gradle
+        run: ./gradlew build --full-stacktrace
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artifacts
+          path: build/libs/
+
+      - name: Create release notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ inputs.version }}
+        run: |
+          gh release create "$tag" \
+              --target main \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="$tag" \
+              --generate-notes
