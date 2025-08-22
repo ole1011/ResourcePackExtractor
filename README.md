@@ -14,6 +14,15 @@ Use this mod responsibly and at your own risk.
 
 ---
 
+## Usage
+1. Connect to a server that sends a resource pack
+2. Go to the resource pack selection screen
+3. Click the button in the top left corner
+4. Select which resource pack to extract
+5. Done! You can now open the folder using the button in the bottom center
+
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).<br>
