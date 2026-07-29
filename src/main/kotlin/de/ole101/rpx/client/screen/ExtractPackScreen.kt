@@ -130,6 +130,6 @@ class ExtractPackScreen(private val parent: Screen) : Screen(translatable("rpx.p
     }
 
     override fun onClose() {
-        minecraft.setScreen(parent)
+        minecraft.gui.setScreen(parent)
     }
 }
