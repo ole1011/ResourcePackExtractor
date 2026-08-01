@@ -34,7 +34,7 @@ class ResourcePackSelectionList(
 
     override fun getRowWidth(): Int = ROW_WIDTH
 
-    override fun scrollBarX(): Int = getRowRight() - 6
+    override fun scrollBarX(): Int = rowRight - 6
 
     override fun setSelected(entry: Entry?) {
         super.setSelected(entry)
