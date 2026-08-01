@@ -3,10 +3,12 @@ package de.ole101.rpx.extraction
 import de.ole101.rpx.exception.ExtractionDirectoryException
 import de.ole101.rpx.exception.InvalidResourcePackException
 import de.ole101.rpx.util.Logger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
@@ -71,7 +73,7 @@ object ExtractionService {
 
             emit(ExtractionEvent.Completed(extractedBytes, extractedEntries, skippedEntries))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     private fun copyDirectory(sourceDirectory: Path, destinationDirectory: Path): Flow<ExtractionEvent> = flow {
         validateDirectory(sourceDirectory)
@@ -114,7 +116,7 @@ object ExtractionService {
 
             emit(ExtractionEvent.Completed(extractedBytes, extractedEntries, skippedEntries))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     private fun validateArchive(sourceFile: Path) {
         if (!sourceFile.exists()) {
@@ -159,9 +161,19 @@ object ExtractionService {
     }
 
     private fun writeFile(inputStream: InputStream, targetFile: Path): Long {
-        Files.newOutputStream(targetFile).use { output ->
-            return inputStream.copyTo(output, BUFFER_SIZE)
+        val extractedBytes = Files.newOutputStream(targetFile).use { output ->
+            inputStream.copyTo(output, BUFFER_SIZE)
         }
+
+        try {
+            if (PngCrcRepairer.repair(targetFile) == PngCrcRepairer.Result.REPAIRED) {
+                Logger.debug("Repaired invalid PNG chunk CRCs in $targetFile")
+            }
+        } catch (exception: Exception) {
+            Logger.warn("Could not repair PNG chunk CRCs in $targetFile; preserving extracted bytes", exception)
+        }
+
+        return extractedBytes
     }
 
     private fun <T> Iterable<T>.totalBytesOrUnknown(selector: (T) -> Long): Long {
